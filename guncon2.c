@@ -32,10 +32,13 @@
 #define GUNCON2_BTN_SELECT BIT(6)
 
 // default calibration, can be updated with evdev-joystick
-#define X_MIN 175
-#define X_MAX 720
-#define Y_MIN 20
-#define Y_MAX 240
+#define ABS_X_MIN 155
+#define ABS_X_MAX 725
+#define ABS_Y_MIN 5
+#define ABS_Y_MAX 239
+#define ABS_FUZZ 1
+#define ABS_X_FLAT 0
+#define ABS_Y_FLAT 5
 
 struct guncon2 {
     struct input_dev *input_device;
@@ -115,7 +118,7 @@ static void guncon2_usb_irq(struct urb *urb) {
 
         // main buttons
         input_report_key(guncon2->input_device, BTN_LEFT, buttons & GUNCON2_TRIGGER);
-        input_report_key(guncon2->input_device, BTN_RIGHT, buttons & GUNCON2_BTN_A || buttons & GUNCON2_BTN_C);
+		input_report_key(guncon2->input_device, BTN_RIGHT, (buttons & GUNCON2_BTN_A) || (buttons & GUNCON2_BTN_C));
         input_report_key(guncon2->input_device, BTN_MIDDLE, buttons & GUNCON2_BTN_B);
         input_report_key(guncon2->input_device, BTN_A, buttons & GUNCON2_BTN_A);
         input_report_key(guncon2->input_device, BTN_B, buttons & GUNCON2_BTN_B);
@@ -255,9 +258,9 @@ static int guncon2_probe(struct usb_interface *intf,
     input_set_capability(guncon2->input_device, EV_KEY, BTN_MIDDLE);
     input_set_capability(guncon2->input_device, EV_ABS, ABS_X);
     input_set_capability(guncon2->input_device, EV_ABS, ABS_Y);
-
-    input_set_abs_params(guncon2->input_device, ABS_X, X_MIN, X_MAX, 0, 0);
-    input_set_abs_params(guncon2->input_device, ABS_Y, Y_MIN, Y_MAX, 0, 0);
+	
+	input_set_abs_params(guncon2->input_device, ABS_X, ABS_X_MIN, ABS_X_MAX, ABS_FUZZ, ABS_X_FLAT);
+	input_set_abs_params(guncon2->input_device, ABS_Y, ABS_Y_MIN, ABS_Y_MAX, ABS_FUZZ, ABS_Y_FLAT);
 
     input_set_capability(guncon2->input_device, EV_KEY, BTN_A);
     input_set_capability(guncon2->input_device, EV_KEY, BTN_B);
